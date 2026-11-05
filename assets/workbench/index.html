@@ -1,0 +1,464 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#172c3a">
+  __MANIFEST_LINK__
+  <title>__PAGE_TITLE__</title>
+  <style>
+    :root { --ground:#f5f6f5; --surface:#fff; --raised:#ecefed; --border:#e0e4e1; --rule:#edf0ee; --control:#cbd3ce; --text:#17201b; --muted:#5f6b64; --accent:#17201b; --data:#2563a8; --positive:#247b50; --negative:#b4232d; --warning:#8a4b08; --gap:16px; --pad:28px; --radius-card:10px; --radius-control:7px; }
+    * { box-sizing:border-box; }
+    html { scroll-behavior:smooth; }
+    body { margin:0; background:var(--ground); color:var(--text); font:14px/1.55 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"PingFang SC","Microsoft YaHei",sans-serif; }
+    button, select, input { font:inherit; }
+    button { cursor:pointer; }
+    .app-header { position:fixed; inset:0 auto 0 0; z-index:6; width:256px; padding:24px 20px; background:var(--surface); border-right:1px solid var(--border); }
+    .header-inner { width:auto; margin:0; }
+    .brand { display:flex; align-items:center; gap:10px; color:var(--text); font-weight:600; }
+    .brand-mark { display:grid; place-items:center; width:30px; height:30px; border:1px solid var(--data); border-radius:8px; background:#eaf2fb; color:var(--data); font-size:11px; letter-spacing:-.04em; font-weight:700; }
+    h1 { margin:0; font-size:24px; line-height:1.2; letter-spacing:-.03em; }
+    .app-header .course-heading { margin-top:34px; font-size:18px; line-height:1.35; font-weight:600; }
+    .course-range { margin-top:8px; color:var(--muted); font-size:12px; }
+    .tabs { position:fixed; inset:170px auto 0 0; z-index:7; display:flex; flex-direction:column; gap:5px; width:256px; padding:0 12px 20px; background:var(--surface); overflow-y:auto; }
+    .tab { min-height:34px; border:0; border-radius:6px; background:transparent; color:var(--muted); padding:8px 10px; text-align:left; white-space:nowrap; }
+    .tab.active { background:var(--raised); color:var(--text); font-weight:600; }
+    main { width:auto; max-width:none; margin-left:256px; padding:40px 56px 60px; }
+    .view { display:none; }
+    .view.active { display:block; }
+    .grid { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:var(--gap); }
+    .home-grid { display:grid; grid-template-columns:minmax(0,1.25fr) minmax(280px,.75fr); gap:var(--gap); margin-top:16px; }
+    .card { background:var(--surface); border:1px solid var(--border); border-radius:var(--radius-card); }
+    .card-pad { padding:20px; }
+    .hero-card { padding:22px; }
+    .hero-card h2 { margin:0 0 15px; font-size:20px; }
+    .muted { color:var(--muted); }
+    .stat { padding:18px 20px; }
+    .stat strong { display:block; font-size:30px; line-height:1; margin-bottom:7px; font-variant-numeric:tabular-nums; font-weight:500; }
+    .stat span { color:var(--muted); font-size:12px; }
+    .section-title { margin:34px 0 12px; font-size:16px; font-weight:600; }
+    .next-card, .focus-card { min-height:204px; padding:22px; }
+    .next-card { display:flex; flex-direction:column; justify-content:space-between; background:#eef5fb; border-color:#d9e7f3; }
+    .next-card h2, .focus-card h2 { margin:0 0 7px; font-size:17px; line-height:1.3; }
+    .next-unit-title { margin:0; font-size:24px; line-height:1.25; letter-spacing:-.02em; }
+    .next-card p { margin:8px 0 0; color:var(--muted); }
+    .next-card-actions { display:flex; flex-wrap:wrap; gap:9px; margin-top:20px; }
+    .focus-list { display:grid; gap:9px; }
+    .focus-item { display:grid; grid-template-columns:1fr auto; gap:12px; align-items:center; padding-top:9px; border-top:1px solid var(--rule); }
+    .focus-item:first-child { padding-top:0; border-top:0; }
+    .focus-item strong { display:-webkit-box; -webkit-box-orient:vertical; -webkit-line-clamp:2; overflow:hidden; font-size:14px; line-height:1.55; }
+    .focus-item span { color:var(--muted); font-size:12px; }
+    .focus-item button { white-space:nowrap; }
+    .stat-strip { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:0; margin-top:16px; overflow:hidden; }
+    .stat-strip .stat { border-right:1px solid var(--rule); }
+    .stat-strip .stat:last-child { border-right:0; }
+    .progress-track { height:7px; background:var(--raised); border-radius:99px; overflow:hidden; }
+    .progress-fill { height:100%; background:var(--data); border-radius:inherit; transition:width .25s ease; }
+    .unit-list { display:grid; gap:10px; }
+    .unit-card { display:grid; grid-template-columns:1fr auto; gap:20px; align-items:center; padding:18px 20px; }
+    .unit-card h3 { margin:0; font-size:15px; font-weight:600; }
+    .unit-card p { margin:3px 0 0; color:var(--muted); font-size:13px; }
+    .unit-meta { display:flex; flex-wrap:wrap; gap:12px; margin-top:10px; color:var(--muted); font-size:12px; }
+    .unit-progress { color:var(--text); font-variant-numeric:tabular-nums; }
+    .unit-card-actions { min-width:150px; text-align:right; }
+    .unit-status { display:flex; justify-content:flex-end; flex-wrap:wrap; gap:5px; min-height:23px; }
+    .badge { display:inline-flex; align-items:center; border-radius:4px; padding:3px 7px; background:var(--raised); color:#3d3d3d; font-size:11px; white-space:nowrap; }
+    .badge.done { background:#dcfae5; color:#04250e; }
+    .badge.weak { background:#ffedea; color:#831c1e; }
+    .primary, .secondary, .danger { border-radius:var(--radius-control); padding:9px 13px; font-weight:600; }
+    .primary { border:1px solid var(--accent); background:var(--accent); color:#fff; }
+    .secondary { border:1px solid var(--control); background:var(--surface); color:var(--text); }
+    .danger { border:1px solid #f1c7c7; background:#fff7f7; color:var(--negative); }
+    .small-button { padding:7px 10px; font-size:12px; }
+    .toolbar { display:flex; flex-wrap:wrap; gap:12px; align-items:center; justify-content:space-between; margin-bottom:18px; }
+    select, input[type=search] { border:1px solid var(--control); border-radius:var(--radius-control); background:var(--surface); padding:9px 10px; color:var(--text); }
+    input[type=search] { width:min(100%,420px); }
+    .study-layout { display:grid; grid-template-columns:220px minmax(0,1fr); gap:20px; align-items:start; }
+    .unit-nav { position:sticky; top:24px; padding:8px; }
+    .unit-nav button { width:100%; border:0; text-align:left; padding:9px 10px; border-radius:6px; background:transparent; color:var(--muted); }
+    .unit-nav button.active { background:var(--raised); color:var(--text); font-weight:600; }
+    .lesson-card { padding:24px; }
+    .lesson-top { display:flex; justify-content:space-between; gap:18px; align-items:flex-start; }
+    .lesson-summary { max-width:760px; margin:10px 0 0; color:var(--muted); font-size:15px; }
+    .unit-progress-card { margin:18px 0 22px; padding:14px 16px; background:var(--raised); border-radius:var(--radius-control); }
+    .unit-progress-card .toolbar { margin-bottom:9px; }
+    .lesson-deep { margin-top:24px; }
+    .lesson-question { padding:18px 20px; background:#eef5fb; border:1px solid #d9e7f3; border-radius:var(--radius-control); }
+    .lesson-question p { margin:6px 0 0; font-size:16px; line-height:1.6; }
+    .lesson-context-grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:16px; margin:16px 0 26px; }
+    .lesson-context { padding:16px; background:var(--raised); border-radius:var(--radius-control); }
+    .lesson-context h3 { margin:0 0 8px; font-size:15px; }
+    .lesson-context ul, .deep-section ul, .worked-example ol, .transfer-list { margin:0; padding-left:21px; }
+    .lesson-context li, .deep-section li, .worked-example li, .transfer-list li { margin:5px 0; }
+    .deep-section { padding:22px 0 24px; border-top:1px solid var(--rule); }
+    .deep-section h3 { margin:0 0 10px; font-size:18px; }
+    .deep-section p { max-width:820px; }
+    .deep-why { color:var(--muted); }
+    .deep-block { margin-top:16px; padding:14px 16px; background:#fafbfa; border-left:3px solid var(--data); border-radius:5px; }
+    .deep-block strong { display:block; margin-bottom:6px; }
+    .deep-block p { margin:0; }
+    .deep-example { margin-top:16px; padding:16px; border:1px solid var(--border); border-radius:var(--radius-control); }
+    .deep-example h4 { margin:0 0 8px; font-size:14px; }
+    .deep-example ol { margin:0; padding-left:22px; }
+    .deep-example li { margin:5px 0; }
+    .deep-example .conclusion { margin:12px 0 0; color:var(--muted); }
+    .deep-section .exam-cue { background:#f4f7fb; border-left-color:var(--data); }
+    .worked-example { margin:28px 0 0; padding:20px; background:var(--raised); border-radius:var(--radius-control); }
+    .worked-example h3, .transfer-block h3 { margin:0 0 10px; font-size:18px; }
+    .worked-example p { margin:7px 0; }
+    .worked-example .conclusion { margin:14px 0 0; color:var(--muted); }
+    .transfer-block { margin:26px 0 0; padding-top:20px; border-top:1px solid var(--rule); }
+    .lesson-card h2 { margin:0; font-size:24px; line-height:1.25; }
+    .lesson-card h3 { margin:27px 0 7px; font-size:16px; color:var(--text); }
+    .lesson-card p { margin:7px 0; }
+    .lesson-card ul { margin:7px 0; padding-left:22px; }
+    .objective-box { padding:13px 15px; border-left:3px solid var(--data); background:#f4f7fb; border-radius:6px; }
+    .objective-box ul { margin:0; }
+    .term-table { width:100%; border-collapse:collapse; margin-top:8px; font-size:13px; }
+    .term-table th, .term-table td { padding:9px 8px; border-bottom:1px solid var(--rule); text-align:left; vertical-align:top; }
+    .term-table th { color:var(--muted); font-size:12px; }
+    .term-en { font-weight:600; color:var(--text); }
+    .source-box { margin-top:22px; padding-top:14px; border-top:1px solid var(--rule); color:var(--muted); font-size:12px; }
+    .quiz-card { padding:20px; }
+    textarea { display:block; width:100%; margin:10px 0 16px; padding:14px; border:1px solid var(--control); border-radius:6px; color:var(--text); background:var(--surface); font:inherit; resize:vertical; }
+    .rubric { border:0; padding:0; margin:16px 0; }
+    .rubric label { display:flex; align-items:flex-start; gap:10px; padding:10px 0; }
+    .rubric input { margin-top:5px; flex:none; width:18px; height:18px; }
+    .result-stats { display:flex; justify-content:center; gap:24px; margin:24px 0; flex-wrap:wrap; }
+    .result-stats strong { display:block; font-size:24px; font-variant-numeric:tabular-nums; }
+    .quiz-meta { flex-wrap:wrap; }
+    #quiz-unit { max-width:100%; }
+    .error-reason { display:block; margin-top:16px; }
+    button:disabled { cursor:default; opacity:1; }
+    button:focus-visible, select:focus-visible, textarea:focus-visible { outline:2px solid var(--data); outline-offset:3px; }
+    .quiz-actions button, .confidence button { min-height:44px; }
+    .quiz-complete { padding:28px; text-align:center; }
+    .quiz-complete h2 { margin:0 0 8px; font-size:24px; }
+    .quiz-complete p { margin:0 auto; max-width:520px; color:var(--muted); }
+    .quiz-meta { display:flex; justify-content:space-between; gap:10px; color:var(--muted); font-size:13px; }
+    .quiz-card h2 { font-size:20px; line-height:1.45; margin:17px 0; }
+    .option-list { display:grid; gap:10px; }
+    .option { width:100%; text-align:left; border:1px solid var(--control); background:var(--surface); border-radius:var(--radius-control); padding:12px 13px; color:var(--text); }
+    .option:hover { border-color:var(--text); background:#fafafa; }
+    .option.selected { border-color:var(--data); background:#f4f7fb; }
+    .option.correct { border-color:#86efac; background:#f0fdf4; }
+    .option.incorrect { border-color:#fca5a5; background:#fff1f2; }
+    .feedback { margin-top:15px; padding:13px 15px; border-radius:6px; background:var(--raised); }
+    .feedback strong { color:var(--text); }
+    .quiz-actions { display:flex; flex-wrap:wrap; gap:9px; margin-top:17px; }
+    .confidence { display:flex; flex-wrap:wrap; gap:7px; margin-top:13px; }
+    .confidence button { border:1px solid var(--control); background:var(--surface); border-radius:var(--radius-control); padding:6px 10px; color:var(--muted); }
+    .confidence button.selected { color:var(--text); border-color:var(--text); background:var(--raised); }
+    .wrong-list { display:grid; gap:11px; }
+    .wrong-item { padding:18px; }
+    .wrong-item h3 { margin:0 0 5px; font-size:15px; }
+    .wrong-item p { margin:4px 0; color:var(--muted); font-size:13px; }
+    .empty { padding:35px 15px; text-align:center; color:var(--muted); }
+    .notice { padding:13px 15px; background:#fffbeb; border:1px solid #fde68a; color:var(--warning); border-radius:6px; font-size:13px; }
+    .calc { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:10px; margin-top:10px; }
+    .calc .card { padding:13px; }
+    .calc strong { display:block; margin-bottom:3px; color:#20505a; }
+    footer { margin-left:256px; padding:0 48px 28px; color:var(--muted); font-size:12px; }
+    .page-heading { display:flex; align-items:flex-start; justify-content:space-between; gap:16px; margin-bottom:24px; }
+    .page-heading h1 { font-weight:600; }
+    .home-summary { margin-top:6px; color:var(--muted); }
+    .heading-actions { display:flex; flex-wrap:wrap; gap:9px; }
+    @media (max-width:800px) { .app-header { position:static; width:auto; height:auto; padding:16px 18px; border-right:0; border-bottom:1px solid var(--border); } .app-header .course-heading { display:none; } .course-range { margin-top:0; } .tabs { position:sticky; inset:auto; width:auto; height:52px; flex-direction:row; padding:8px 12px; border-bottom:1px solid var(--border); overflow-x:auto; } .tab { min-height:36px; } main, footer { margin-left:0; } main { padding:24px 20px 44px; } footer { padding:0 20px 28px; } .home-grid { grid-template-columns:1fr; } .grid { grid-template-columns:repeat(3,minmax(0,1fr)); } .study-layout { grid-template-columns:1fr; } .unit-nav { position:static; display:flex; overflow-x:auto; gap:5px; padding:7px; } .unit-nav button { width:auto; min-width:max-content; } }
+    @media (max-width:520px) { main { padding:22px 16px 35px; } .home-grid, .grid, .calc, .lesson-context-grid { grid-template-columns:1fr; } .stat-strip { grid-template-columns:repeat(3,minmax(0,1fr)); } .stat-strip .stat { padding:15px 12px; } .stat { padding:15px 12px; } .stat strong { font-size:24px; } .stat span { font-size:11px; } .unit-card { grid-template-columns:1fr; gap:13px; } .unit-card-actions { min-width:0; text-align:left; } .unit-status { justify-content:flex-start; } .unit-card-actions .primary, .unit-card-actions .secondary { width:100%; } .lesson-card, .quiz-card { padding:16px; } .lesson-top { display:block; } .lesson-top .badge { display:inline-flex; margin-top:12px; } .lesson-summary { font-size:14px; } .lesson-question { padding:16px; } .lesson-question p { font-size:15px; } .deep-section h3, .worked-example h3, .transfer-block h3 { font-size:17px; } .term-table { font-size:12px; } .term-table th, .term-table td { padding:7px 5px; } .page-heading { display:block; } .page-heading .primary { margin-top:14px; width:100%; } .next-card, .focus-card { min-height:0; padding:18px; } .next-unit-title { font-size:21px; } }
+    button, select, input[type=search] { min-height:44px; }
+    .focus-item > div, .unit-card > div, .home-grid > article { min-width:0; }
+    .lesson-card, .quiz-card, .wrong-item { overflow-wrap:anywhere; }
+    .term-table { table-layout:fixed; overflow-wrap:anywhere; }
+    .heading-actions { margin-top:8px; }
+    .next-card { background:var(--surface); border-color:var(--border); }
+    @media (min-width:801px) and (max-width:1100px) { main { padding:32px; } .home-grid, .study-layout { grid-template-columns:1fr; } .unit-nav { position:static; } }
+    @media (max-width:800px) { .tabs { height:auto; } .tab { min-height:44px; } }
+    @media (max-width:520px) { .stat span { font-size:12px; } .next-card-actions > button { flex:1; } }
+    @media (prefers-reduced-motion:reduce) { html { scroll-behavior:auto; } .progress-fill { transition:none; } }
+  </style>
+</head>
+<body>
+  <header class="app-header"><div class="header-inner">
+    <div class="brand"><span class="brand-mark" id="brand-mark"></span><span id="brand-name"></span></div>
+    <div class="course-heading" id="course-title"></div>
+    <div class="course-range" id="course-scope"></div>
+  </div></header>
+  <nav class="tabs" aria-label="Main navigation">
+    <button class="tab active" data-view="home">首页</button>
+    <button class="tab" data-view="study">学习路线</button>
+    <button class="tab" data-view="quiz">知识排查</button>
+    <button class="tab" data-view="wrong">薄弱点与错题</button>
+  </nav>
+  <main>
+    <section id="home-view" class="view active"></section>
+    <section id="study-view" class="view"></section>
+    <section id="quiz-view" class="view"></section>
+    <section id="wrong-view" class="view"></section>
+  </main>
+  <footer>__FOOTER_TEXT__</footer>
+    __CONTENT_SCRIPTS__
+  <script>
+    const courseData = window.EXAM_KIT_DATA;
+    const storageKey = `exam-review-${courseData.course.id}-v1`;
+    const defaultState = { schemaVersion: 2, completedUnits: [], answers: {}, confidence: {}, drafts: {}, selectedUnit: courseData.units[0].id, selectedQuestionIndex: 0, updatedAt: null };
+    let appState = loadState();
+    let retryQuestionId = null;
+
+    function loadState() {
+      try {
+        const saved = JSON.parse(localStorage.getItem(storageKey) || "{}");
+        const result = { ...JSON.parse(JSON.stringify(defaultState)), ...saved };
+        for (const field of ["answers", "confidence", "drafts"]) if (!result[field] || typeof result[field] !== "object" || Array.isArray(result[field])) result[field] = {};
+        for (const [questionId, record] of Object.entries(result.answers)) {
+          if (!record || typeof record !== "object" || Array.isArray(record)) delete result.answers[questionId];
+          else if (!Array.isArray(record.history)) record.history = [];
+        }
+        if (!courseData.units.some(unit => unit.id === result.selectedUnit)) result.selectedUnit = courseData.units[0].id;
+        if (!Number.isInteger(result.selectedQuestionIndex) || result.selectedQuestionIndex < 0) result.selectedQuestionIndex = 0;
+        return result;
+      } catch (error) {
+        document.querySelector("footer").textContent = "无法读取本地记录，当前会话仍可学习；请定期导出记录。";
+        return JSON.parse(JSON.stringify(defaultState));
+      }
+    }
+    function saveState() {
+      syncCompletion();
+      appState.schemaVersion = 2;
+      appState.updatedAt = new Date().toISOString();
+      try { localStorage.setItem(storageKey, JSON.stringify(appState)); }
+      catch (error) { document.querySelector("footer").textContent = "当前浏览器无法保存进度，请在薄弱点页导出记录。"; }
+    }
+    function escapeHtml(value) { return String(value).replace(/[&<>"']/g, character => ({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;"}[character])); }
+    function unitById(unitId) { return courseData.units.find(unit => unit.id === unitId) || courseData.units[0]; }
+    function allQuestions() { return courseData.units.flatMap(unit => unit.questions.map(question => ({ ...question, unitId: unit.id, unitTitle: unit.title, week: unit.week }))); }
+    function answerRecords() { return Object.entries(appState.answers).map(([questionId, record]) => ({ questionId, ...record })); }
+    function progressPercent() { return Math.round((appState.completedUnits.length / courseData.units.length) * 100); }
+    function answeredCount() { return allQuestions().filter(question => isAnswered(question, appState.answers[question.id])).length; }
+    function correctCount() { return allQuestions().filter(question => isAnswered(question, appState.answers[question.id]) && appState.answers[question.id].correct).length; }
+    function answerProgressPercent() { return Math.round((answeredCount() / allQuestions().length) * 100); }
+    function unitAnsweredCount(unit) { return unit.questions.filter(question => isAnswered(question, appState.answers[question.id])).length; }
+    function showView(viewName) {
+      document.querySelectorAll(".view").forEach(view => view.classList.toggle("active", view.id === `${viewName}-view`));
+      document.querySelectorAll(".tab").forEach(tab => tab.classList.toggle("active", tab.dataset.view === viewName));
+      if (viewName === "home") renderHome();
+      if (viewName === "study") renderStudy();
+      if (viewName === "quiz") renderQuiz();
+      if (viewName === "wrong") renderWrong();
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+    function renderHome() {
+      syncCompletion();
+      const wrongCount = allQuestions().filter(question => needsReview(appState.answers[question.id])).length;
+      const nextUnit = nextIncompleteUnit();
+      const allComplete = appState.completedUnits.length === courseData.units.length;
+      const focusQuestions = allQuestions().filter(question => needsReview(appState.answers[question.id])).slice(0, 3);
+      document.getElementById("home-view").innerHTML = `
+        <div class="page-heading"><h1>学习工作台</h1><button class="secondary" data-action="review-home">查看薄弱点</button></div>
+        <div class="home-grid">
+          <article class="card next-card"><div><h2>${allComplete ? "本轮排查已完成" : "接下来复习"}</h2><p class="next-unit-title">${escapeHtml(nextUnit.zhTitle)}</p><p>${allComplete ? (wrongCount ? "先处理复习队列中的薄弱题。" : "可以回看课程；完成排查不等于掌握全部知识点。") : `${unitAnsweredCount(nextUnit)}/${nextUnit.questions.length} 题已完成 · ${escapeHtml(nextUnit.difficulty)}`}</p></div><div class="next-card-actions"><button class="primary" data-action="continue">${allComplete ? (wrongCount ? "复习薄弱题" : "回看课程") : "继续排查"}</button><button class="secondary" data-action="continue-study">先看讲解</button></div></article>
+          <article class="card focus-card"><h2>${wrongCount ? `${wrongCount} 道题进入复习队列` : "当前没有待复习题"}</h2>${focusQuestions.length ? `<div class="focus-list">${focusQuestions.map(question => { const record = appState.answers[question.id]; return `<div class="focus-item"><div><strong>${escapeHtml(question.prompt)}</strong><span>${escapeHtml(question.week)} · ${record.reason ? escapeHtml(record.reason) : (record.correct === false ? "答错 / 自评未达标" : "把握不足")}</span></div><button class="secondary small-button" data-review-question="${question.id}">重做</button></div>`; }).join("")}</div>` : ""}</article>
+        </div>
+        <div class="card stat-strip"><div class="stat"><strong>${progressPercent()}%</strong><span>单元完成度</span></div><div class="stat"><strong>${answeredCount()}</strong><span>已排查题目</span></div><div class="stat"><strong>${correctCount()}</strong><span>答对 / 自评达标</span></div></div>
+        <div class="card card-pad" style="margin-top:16px"><div class="toolbar"><strong>整体题目进度</strong><span class="muted">${answerProgressPercent()}%</span></div><div class="progress-track"><div class="progress-fill" style="width:${answerProgressPercent()}%"></div></div></div>
+        <h2 class="section-title">学习路线</h2><div class="unit-list">${courseData.units.map((unit, index) => unitCard(unit, index)).join("")}</div>`;
+      bindHomeEvents();
+    }
+    function unitCard(unit, index) {
+      const done = appState.completedUnits.includes(unit.id);
+      const unitWrong = unit.questions.filter(question => needsReview(appState.answers[question.id])).length;
+      const answered = unitAnsweredCount(unit);
+      return `<article class="card unit-card"><div><h3>${escapeHtml(unit.week)} · ${escapeHtml(unit.zhTitle)}</h3><p>${escapeHtml(unit.title)}</p><div class="unit-meta"><span class="unit-progress">${answered}/${unit.questions.length} 题已排查</span><span>${escapeHtml(unit.difficulty)}</span></div></div><div class="unit-card-actions"><div class="unit-status">${done ? `<span class="badge done">已完成</span>` : ""}${unitWrong ? `<span class="badge weak">${unitWrong} 待复习</span>` : ""}</div><button class="secondary small-button" data-unit="${unit.id}" data-action="unit-quiz" style="display:block;margin:8px 0 0 auto">${done ? "查看结果" : (answered ? "继续排查" : "开始排查")}</button><button class="secondary small-button" data-unit="${unit.id}" data-action="study-unit" style="display:block;margin:6px 0 0 auto">查看讲解</button></div></article>`;
+    }
+    function bindHomeEvents() {
+      const home = document.getElementById("home-view");
+      home.querySelector('[data-action="continue"]').addEventListener("click", () => {
+        if (appState.completedUnits.length < courseData.units.length) return startUnit(nextIncompleteUnit().id);
+        const weakQuestion = allQuestions().find(question => needsReview(appState.answers[question.id]));
+        if (weakQuestion) return retryQuestion(weakQuestion.id);
+        appState.selectedUnit = nextIncompleteUnit().id;
+        saveState();
+        showView("study");
+      });
+      home.querySelector('[data-action="continue-study"]').addEventListener("click", () => { appState.selectedUnit = nextIncompleteUnit().id; saveState(); showView("study"); });
+      home.querySelector('[data-action="review-home"]').addEventListener("click", () => showView("wrong"));
+      home.querySelectorAll('[data-action="study-unit"]').forEach(button => button.addEventListener("click", () => { appState.selectedUnit = button.dataset.unit; saveState(); showView("study"); }));
+      home.querySelectorAll('[data-action="unit-quiz"]').forEach(button => button.addEventListener("click", () => startUnit(button.dataset.unit)));
+      home.querySelectorAll("[data-review-question]").forEach(button => button.addEventListener("click", () => retryQuestion(button.dataset.reviewQuestion)));
+    }
+    function nextIncompleteUnit() { return courseData.units.find(unit => !appState.completedUnits.includes(unit.id)) || courseData.units[0]; }
+    function renderStudy() {
+      const selectedUnit = unitById(appState.selectedUnit);
+      document.getElementById("study-view").innerHTML = `<div class="page-heading"><h1>学习路线</h1><button class="primary" data-action="unit-quiz">开始本单元排查</button></div><div class="study-layout"><aside class="card unit-nav">${courseData.units.map(unit => `<button class="${unit.id === selectedUnit.id ? "active" : ""}" data-study-unit="${unit.id}">${escapeHtml(unit.week)} · ${escapeHtml(unit.zhTitle)}</button>`).join("")}</aside><article class="card lesson-card">${renderLesson(selectedUnit)}</article></div>`;
+      document.querySelectorAll("[data-study-unit]").forEach(button => button.addEventListener("click", () => { appState.selectedUnit = button.dataset.studyUnit; saveState(); renderStudy(); }));
+      document.querySelectorAll('#study-view [data-action="unit-quiz"]').forEach(button => button.addEventListener("click", () => startUnit(selectedUnit.id)));
+    }
+    function renderList(items) { return (items || []).map(item => `<li>${escapeHtml(item)}</li>`).join(""); }
+    function paragraphs(value) { return String(value).split(/\n\s*\n/).map(part => `<p>${escapeHtml(part)}</p>`).join(""); }
+    function renderLessonDetails(lesson) {
+      return `<div class="lesson-deep"><p class="muted">${escapeHtml(lesson.provenance)}</p><div class="lesson-question"><strong>本单元要解决的问题</strong><p>${escapeHtml(lesson.question)}</p></div><div class="lesson-context-grid"><div class="lesson-context"><h3>前置知识</h3><ul>${renderList(lesson.prerequisites)}</ul></div><div class="lesson-context"><h3>概念关系</h3><ul>${renderList(lesson.conceptMap)}</ul></div></div>${lesson.sections.map(section => `<section class="deep-section" id="${section.id}"><h3>${escapeHtml(section.heading)}</h3><p class="deep-why">${escapeHtml(section.why)}</p>${paragraphs(section.body)}<div class="deep-block"><strong>关键机制与边界</strong><ul>${renderList(section.points)}</ul></div><div class="deep-example"><h4>${escapeHtml(section.example.title)}</h4><ol>${renderList(section.example.steps)}</ol><p class="conclusion">${escapeHtml(section.example.conclusion)}</p></div><div class="deep-block"><strong>常见误区</strong><ul>${renderList(section.pitfalls)}</ul></div><div class="deep-block exam-cue"><strong>考试识别</strong><p>${escapeHtml(section.examCue)}</p></div><p class="source-box">${escapeHtml(section.source)}</p></section>`).join("")}<section class="worked-example"><h3>综合例题</h3><p>${escapeHtml(lesson.workedExample.scenario)}</p><ol>${renderList(lesson.workedExample.steps)}</ol><p class="conclusion">${escapeHtml(lesson.workedExample.conclusion)}</p></section><section class="transfer-block"><h3>迁移到新情境</h3><ul class="transfer-list">${renderList(lesson.transfer)}</ul></section><section class="transfer-block"><h3>复习要点</h3><ul>${lesson.sections.map(section => `<li><a href="#${section.id}">${escapeHtml(section.heading)}</a>：${escapeHtml(section.example.conclusion)}</li>`).join("")}</ul></section></div>`;
+    }
+    function renderLesson(unit) {
+      const answered = unitAnsweredCount(unit);
+      const lessonContent = renderLessonDetails(unit.lesson);
+      return `<div class="lesson-top"><div><h2>${escapeHtml(unit.zhTitle)}</h2><p class="muted">${escapeHtml(unit.title)}</p><p class="lesson-summary">${escapeHtml(unit.summary)}</p></div><span class="badge">${escapeHtml(unit.difficulty)}</span></div><div class="unit-progress-card"><div class="toolbar"><strong>本单元排查进度</strong><span class="muted">${answered}/${unit.questions.length}</span></div><div class="progress-track"><div class="progress-fill" style="width:${Math.round((answered / unit.questions.length) * 100)}%"></div></div></div><div class="objective-box"><strong>学完后你应该能</strong><ul>${renderList(unit.objectives)}</ul></div>${lessonContent}<h3>术语</h3><table class="term-table"><thead><tr><th>原词</th><th>中文</th><th>含义</th></tr></thead><tbody>${unit.terms.map(term => `<tr><td class="term-en">${escapeHtml(term[0])}</td><td>${escapeHtml(term[1])}</td><td>${escapeHtml(term[2])}</td></tr>`).join("")}</tbody></table><div class="source-box">${escapeHtml(unit.source)}</div><div class="quiz-actions"><button class="primary" data-action="unit-quiz">开始知识排查 · ${unit.questions.length} 题</button></div>`;
+    }
+    function isAnswered(question, record) {
+      if (!record || typeof record.correct !== "boolean") return false;
+      return question.type === "written"
+        ? typeof record.writtenAnswer === "string" && Number.isInteger(record.score)
+        : Number.isInteger(record.answer) && record.answer >= 0 && record.answer < question.options.length;
+    }
+    function needsReview(record) {
+      return Boolean(record && (record.correct === false || ["不确定", "不会"].includes(record.confidence)));
+    }
+    function syncCompletion() {
+      appState.completedUnits = courseData.units.filter(unit => unit.questions.every(question => isAnswered(question, appState.answers[question.id]))).map(unit => unit.id);
+    }
+    function firstUnanswered(unit) {
+      const questionIndex = unit.questions.findIndex(question => !isAnswered(question, appState.answers[question.id]));
+      return questionIndex < 0 ? unit.questions.length : questionIndex;
+    }
+    function startUnit(unitId) {
+      appState.selectedUnit = unitId;
+      appState.selectedQuestionIndex = firstUnanswered(unitById(unitId));
+      retryQuestionId = null;
+      saveState();
+      showView("quiz");
+    }
+    function optionOrder(question) {
+      const indexes = question.options.map((option, index) => index);
+      let seed = [...question.id].reduce((value, character) => (value * 31 + character.charCodeAt(0)) >>> 0, 2166136261);
+      for (let position = indexes.length - 1; position > 0; position -= 1) {
+        seed = (Math.imul(seed, 1664525) + 1013904223) >>> 0;
+        const swapIndex = seed % (position + 1);
+        [indexes[position], indexes[swapIndex]] = [indexes[swapIndex], indexes[position]];
+      }
+      return indexes;
+    }
+    function persistAnswer(question, record) {
+      const previous = appState.answers[question.id];
+      const history = previous?.history || [];
+      const snapshot = previous && isAnswered(question, previous) ? [{ ...previous, history: undefined }] : [];
+      appState.answers[question.id] = { ...record, unitId: appState.selectedUnit, updatedAt: new Date().toISOString(), history: [...history, ...snapshot].slice(-20) };
+      retryQuestionId = null;
+      saveState();
+    }
+    function renderQuizSummary(unit) {
+      const answeredCount = unit.questions.filter(question => isAnswered(question, appState.answers[question.id])).length;
+      const correctCount = unit.questions.filter(question => isAnswered(question, appState.answers[question.id]) && appState.answers[question.id].correct).length;
+      const weakQuestions = unit.questions.filter(question => needsReview(appState.answers[question.id]));
+      const nextUnit = courseData.units[courseData.units.indexOf(unit) + 1];
+      const complete = answeredCount === unit.questions.length;
+      document.getElementById("quiz-view").innerHTML = `<div class="card quiz-complete"><h1>${escapeHtml(unit.zhTitle)}</h1><p>${complete ? "本章排查完成" : "本章尚有未完成题目"}</p><div class="result-stats"><span><strong>${answeredCount}/${unit.questions.length}</strong> 已作答</span><span><strong>${correctCount}</strong> 答对 / 自评达标</span><span><strong>${weakQuestions.length}</strong> 待复习</span></div><p>综合案例按评分要点自评；完成排查不等于全部掌握。</p><div class="quiz-actions" style="justify-content:center">${!complete ? '<button class="primary" data-action="resume-unit">继续未完成题目</button>' : nextUnit ? `<button class="primary" data-action="next-unit">下一章 · ${escapeHtml(nextUnit.zhTitle)}</button>` : '<button class="primary" data-action="course-home">返回课程</button>'}${weakQuestions.length ? '<button class="secondary" data-action="redo-weak">重做薄弱题</button>' : ''}<button class="secondary" data-action="review-queue">复习列表</button>${nextUnit || !complete ? '<button class="secondary" data-action="course-home">返回课程</button>' : ''}</div></div>`;
+      document.querySelector('[data-action="resume-unit"]')?.addEventListener("click", () => startUnit(unit.id));
+      document.querySelector('[data-action="next-unit"]')?.addEventListener("click", () => startUnit(nextUnit.id));
+      document.querySelector('[data-action="redo-weak"]')?.addEventListener("click", () => retryQuestion(weakQuestions[0].id));
+      document.querySelector('[data-action="review-queue"]')?.addEventListener("click", () => showView("wrong"));
+      document.querySelector('[data-action="course-home"]')?.addEventListener("click", () => showView("home"));
+    }
+    function renderQuiz() {
+      const unit = unitById(appState.selectedUnit);
+      if (appState.selectedQuestionIndex >= unit.questions.length) {
+        renderQuizSummary(unit);
+        return;
+      }
+      const question = unit.questions[appState.selectedQuestionIndex] || unit.questions[0];
+      const retrying = retryQuestionId === question.id;
+      const record = retrying ? null : appState.answers[question.id];
+      const answered = isAnswered(question, record);
+      const written = question.type === "written";
+      const revealed = written && record?.revealed;
+      const confidence = record?.confidence || appState.confidence[question.id];
+      const unitOptions = courseData.units.map(item => `<option value="${item.id}" ${item.id === unit.id ? "selected" : ""}>${escapeHtml(item.week)} · ${escapeHtml(item.zhTitle)}</option>`).join("");
+      const questionOptions = unit.questions.map((item, index) => `<option value="${index}" ${index === appState.selectedQuestionIndex ? "selected" : ""}>${index + 1}. ${escapeHtml(item.level)}${isAnswered(item, appState.answers[item.id]) ? " · 已答" : ""}</option>`).join("");
+      let responseArea;
+      if (written) {
+        responseArea = `<label for="written-answer">你的分析（中文或英文）</label><textarea id="written-answer" rows="7" maxlength="8000" ${revealed ? "readonly" : ""}>${escapeHtml(record?.writtenAnswer || appState.drafts[question.id] || "")}</textarea>${!revealed ? '<button class="primary" data-action="reveal-case">提交并对照评分要点</button><p class="muted" id="written-error" role="status"></p>' : `<div class="feedback"><h3>参考分析</h3><p>${escapeHtml(question.explanation)}</p><fieldset class="rubric"><legend>你的原回答包含哪些要点？</legend>${question.rubric.map((criterion, index) => `<label><input type="checkbox" data-criterion="${index}" ${record.criteria?.includes(index) ? "checked" : ""} ${answered ? "disabled" : ""}>${escapeHtml(criterion)}</label>`).join("")}</fieldset>${answered ? `<p>自评：${record.score}/${question.rubric.length} 项</p>` : '<button class="primary" data-action="grade-case">保存自评</button>'}</div>`}`;
+      } else {
+        responseArea = `<div class="option-list">${optionOrder(question).map((optionIndex, displayIndex) => `<button class="option ${answered && optionIndex === question.answer ? "correct" : ""} ${answered && record.answer === optionIndex && !record.correct ? "incorrect" : ""}" data-option="${optionIndex}" ${answered ? "disabled" : ""}>${String.fromCharCode(65 + displayIndex)}. ${escapeHtml(question.options[optionIndex])}</button>`).join("")}</div>${answered ? `<div class="feedback" role="status"><strong>${record.correct ? "回答正确" : "需要复习"}</strong><p>${escapeHtml(question.explanation)}</p></div>` : ""}`;
+      }
+      document.getElementById("quiz-view").innerHTML = `<div class="toolbar"><h1>知识排查</h1><select id="quiz-unit" aria-label="选择章节">${unitOptions}</select></div><div class="card quiz-card"><div class="quiz-meta"><span>${escapeHtml(unit.week)} · 第 ${appState.selectedQuestionIndex + 1}/${unit.questions.length} 题 · ${escapeHtml(question.level)}</span><select id="question-jump" aria-label="跳转题目">${questionOptions}</select></div><h2>${escapeHtml(question.prompt)}</h2>${responseArea}<div class="confidence"><span class="muted">把握程度</span>${["会", "不确定", "不会"].map(level => `<button aria-pressed="${confidence === level}" class="${confidence === level ? "selected" : ""}" data-confidence="${level}">${level}</button>`).join("")}</div>${answered ? `<div class="source-box">依据：${escapeHtml(question.source)} · 自编练习，非官方考题</div>${needsReview(record) ? `<label class="error-reason">主要卡点 <select id="error-reason" aria-label="错因"><option value="">选择错因</option>${(courseData.course.errorReasons || ["术语混淆", "概念关系", "情境判断", "计算步骤", "统计解释", "读题疏忽"]).map(reason => `<option ${record.reason === reason ? "selected" : ""}>${reason}</option>`).join("")}</select></label>` : ""}` : ""}<div class="quiz-actions">${answered ? `<button class="primary" data-action="next-question">${appState.selectedQuestionIndex === unit.questions.length - 1 ? "查看本章结果" : "下一题"}</button><button class="secondary" data-action="retry-question">重做本题</button>` : ""}${appState.selectedQuestionIndex > 0 ? '<button class="secondary" data-action="previous-question">上一题</button>' : ""}<button class="secondary" data-action="study-current">回到讲解</button></div></div>`;
+      document.getElementById("quiz-unit").addEventListener("change", event => startUnit(event.target.value));
+      document.getElementById("question-jump").addEventListener("change", event => { appState.selectedQuestionIndex = Number(event.target.value); retryQuestionId = null; saveState(); renderQuiz(); });
+      document.querySelectorAll("[data-option]").forEach(button => button.addEventListener("click", () => submitAnswer(question, Number(button.dataset.option))));
+      document.querySelectorAll("[data-confidence]").forEach(button => button.addEventListener("click", () => setConfidence(question, button.dataset.confidence)));
+      document.querySelector('[data-action="next-question"]')?.addEventListener("click", () => { appState.selectedQuestionIndex += 1; retryQuestionId = null; saveState(); renderQuiz(); window.scrollTo(0, 0); });
+      document.querySelector('[data-action="previous-question"]')?.addEventListener("click", () => { appState.selectedQuestionIndex -= 1; retryQuestionId = null; saveState(); renderQuiz(); });
+      document.querySelector('[data-action="retry-question"]')?.addEventListener("click", () => retryQuestion(question.id));
+      document.querySelector('[data-action="study-current"]')?.addEventListener("click", () => {
+        showView("study");
+        document.getElementById(question.sectionIds[0])?.scrollIntoView({ block: "start" });
+      });
+      document.getElementById("error-reason")?.addEventListener("change", event => { appState.answers[question.id].reason = event.target.value; saveState(); });
+      document.getElementById("written-answer")?.addEventListener("input", event => { appState.drafts[question.id] = event.target.value; saveState(); });
+      document.querySelector('[data-action="reveal-case"]')?.addEventListener("click", () => {
+        const writtenAnswer = document.getElementById("written-answer").value.trim();
+        if (writtenAnswer.length < 20) {
+          document.getElementById("written-error").textContent = "请先写出你的判断和理由（至少 20 个字符），再对照答案。";
+          return;
+        }
+        persistAnswer(question, { writtenAnswer, revealed: true, correct: null, confidence: appState.confidence[question.id] || "未标记" });
+        renderQuiz();
+      });
+      document.querySelector('[data-action="grade-case"]')?.addEventListener("click", () => {
+        const criteria = [...document.querySelectorAll("[data-criterion]:checked")].map(input => Number(input.dataset.criterion));
+        persistAnswer(question, { ...appState.answers[question.id], criteria, score: criteria.length, correct: criteria.length === question.rubric.length, grading: "self" });
+        renderQuiz();
+      });
+    }
+    function submitAnswer(question, selectedAnswer) {
+      const existing = appState.answers[question.id];
+      if (retryQuestionId !== question.id && isAnswered(question, existing)) return;
+      persistAnswer(question, { answer: selectedAnswer, correct: selectedAnswer === question.answer, confidence: appState.confidence[question.id] || "未标记", grading: "automatic" });
+      renderQuiz();
+    }
+    function setConfidence(question, confidence) {
+      appState.confidence[question.id] = confidence;
+      if (retryQuestionId !== question.id && appState.answers[question.id]) appState.answers[question.id].confidence = confidence;
+      saveState();
+      renderQuiz();
+    }
+    function retryQuestion(questionId) {
+      const unit = courseData.units.find(item => item.questions.some(question => question.id === questionId));
+      if (!unit) return;
+      retryQuestionId = questionId;
+      appState.selectedUnit = unit.id;
+      appState.selectedQuestionIndex = unit.questions.findIndex(question => question.id === questionId);
+      appState.drafts[questionId] = "";
+      delete appState.confidence[questionId];
+      saveState();
+      showView("quiz");
+    }
+    function renderWrong() {
+      const records = allQuestions().filter(question => needsReview(appState.answers[question.id]));
+      document.getElementById("wrong-view").innerHTML = `<div class="page-heading"><h1>薄弱点与错题${records.length ? ` · ${records.length}` : ""}</h1><div class="heading-actions"><button class="secondary small-button" data-action="export-review">导出复习记录</button><button class="danger small-button" data-action="reset-progress">清空本地进度</button></div></div>${records.length ? `<div class="wrong-list">${records.map(question => { const record = appState.answers[question.id]; return `<article class="card wrong-item"><h3>${escapeHtml(question.prompt)}</h3><p>${escapeHtml(question.week)} · ${escapeHtml(question.level)} · ${record.correct === false ? "答错" : "把握不足"}${record.reason ? ` · 错因：${escapeHtml(record.reason)}` : ""}</p><div class="quiz-actions"><button class="primary small-button" data-review-question="${question.id}">重做本题</button><button class="secondary small-button" data-review-lesson="${question.unitId}">回到讲解</button></div></article>`; }).join("")}</div>` : '<div class="card empty">暂无待复习题。</div>'}`;
+      document.querySelectorAll("#wrong-view [data-review-question]").forEach(button => button.addEventListener("click", () => retryQuestion(button.dataset.reviewQuestion)));
+      document.querySelectorAll("#wrong-view [data-review-lesson]").forEach(button => button.addEventListener("click", () => { appState.selectedUnit = button.dataset.reviewLesson; saveState(); showView("study"); }));
+      document.querySelector('[data-action="export-review"]').addEventListener("click", exportReviewSnapshot);
+      document.querySelector('[data-action="reset-progress"]').addEventListener("click", () => {
+        if (confirm("清空当前浏览器的全部学习进度、答案与错题记录？")) { appState = JSON.parse(JSON.stringify(defaultState)); retryQuestionId = null; saveState(); renderWrong(); }
+      });
+    }
+    function exportReviewSnapshot() {
+      syncCompletion();
+      const snapshot = { schemaVersion: 2, courseId: courseData.course.id, courseVersion: courseData.version, exportedAt: new Date().toISOString(), course: courseData.course, completedUnits: appState.completedUnits, answers: appState.answers, confidence: appState.confidence, drafts: appState.drafts, questions: allQuestions().map(question => ({ ...question })) };
+      const blob = new Blob([JSON.stringify(snapshot, null, 2)], { type: "application/json" });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.href = url;
+      link.download = `${courseData.course.id}-review-records.json`;
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+      setTimeout(() => URL.revokeObjectURL(url), 1000);
+    }
+    document.getElementById("course-title").textContent = courseData.course.shortTitle || courseData.course.title || "Exam review";
+    document.getElementById("brand-name").textContent = courseData.course.brand || "复习工作台";
+    document.getElementById("brand-mark").textContent = courseData.course.mark || "学";
+    document.getElementById("course-scope").textContent = courseData.course.scope;
+    document.querySelectorAll(".tab").forEach(tab => tab.addEventListener("click", () => showView(tab.dataset.view)));
+    renderHome();
+    __SERVICE_WORKER__
+  </script>
+</body>
+</html>
