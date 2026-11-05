@@ -1,0 +1,10 @@
+{
+  "name": "复习工作台",
+  "short_name": "复习工作台",
+  "lang": "zh-CN",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "background_color": "#f5f6f5",
+  "theme_color": "#172c3a",
+  "icons": []
+}
