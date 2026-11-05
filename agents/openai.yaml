@@ -1,0 +1,6 @@
+interface:
+  display_name: "Exam Kit"
+  short_description: "Generate deep exam-study workbenches"
+  default_prompt: "Use $exam-kit to turn my course materials into a deep exam-preparation workbench and let me choose local HTML or Vercel delivery."
+policy:
+  allow_implicit_invocation: true
